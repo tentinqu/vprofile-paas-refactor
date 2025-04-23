@@ -1,0 +1,20 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Visualpathit VProfile Webapp,com.visualpathit.account.beans,Components,87,0,0,0,37,0,25,0,25,0
+Visualpathit VProfile Webapp,com.visualpathit.account.validator,UserValidator,67,0,12,0,14,0,9,0,3,0
+Visualpathit VProfile Webapp,com.visualpathit.account,UserNotFoundException,4,0,0,0,2,0,1,0,1,0
+Visualpathit VProfile Webapp,com.visualpathit.account,AuthenticationFailureHandler,10,0,0,0,3,0,2,0,2,0
+Visualpathit VProfile Webapp,com.visualpathit.account,GlobalExceptionHandler,22,0,0,0,7,0,4,0,4,0
+Visualpathit VProfile Webapp,com.visualpathit.account.controller,RabbitMqController,51,0,4,0,19,0,4,0,2,0
+Visualpathit VProfile Webapp,com.visualpathit.account.controller,FileUploadController,94,0,4,0,26,0,6,0,4,0
+Visualpathit VProfile Webapp,com.visualpathit.account.controller,ElasticSearchController,169,0,2,0,43,0,6,0,5,0
+Visualpathit VProfile Webapp,com.visualpathit.account.controller,UserController,233,0,14,0,66,0,20,0,13,0
+Visualpathit VProfile Webapp,com.visualpathit.account.model,User,161,0,0,0,69,0,46,0,46,0
+Visualpathit VProfile Webapp,com.visualpathit.account.model,Role,21,0,0,0,9,0,6,0,6,0
+Visualpathit VProfile Webapp,com.visualpathit.account.utils,RabbitMqUtil,18,0,0,0,7,0,6,0,6,0
+Visualpathit VProfile Webapp,com.visualpathit.account.utils,ElasticsearchUtil,48,0,0,0,16,0,3,0,3,0
+Visualpathit VProfile Webapp,com.visualpathit.account.utils,MemcachedUtils,319,0,30,0,91,0,21,0,6,0
+Visualpathit VProfile Webapp,com.visualpathit.account.service,ProducerServiceImpl,69,0,0,0,22,0,2,0,2,0
+Visualpathit VProfile Webapp,com.visualpathit.account.service,UserServiceImpl,38,0,0,0,8,0,5,0,5,0
+Visualpathit VProfile Webapp,com.visualpathit.account.service,UserDetailsServiceImpl,49,0,4,0,9,0,4,0,2,0
+Visualpathit VProfile Webapp,com.visualpathit.account.service,ConsumerServiceImpl,13,0,0,0,4,0,2,0,2,0
+Visualpathit VProfile Webapp,com.visualpathit.account.service,SecurityServiceImpl,68,0,4,0,16,0,6,0,4,0

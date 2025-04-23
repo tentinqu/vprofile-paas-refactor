@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Visualpathit VProfile Webapp</a> &gt; <a href="index.source.html" class="el_package">com.visualpathit.account.controller</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.visualpathit.account.controller;
+
+import com.visualpathit.account.model.User;
+import com.visualpathit.account.service.ProducerService;
+import com.visualpathit.account.service.SecurityService;
+import com.visualpathit.account.service.UserService;
+import com.visualpathit.account.utils.MemcachedUtils;
+import com.visualpathit.account.validator.UserValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.UUID;
+
+@Controller
+<span class="nc" id="L20">public class UserController {</span>
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private SecurityService securityService;
+
+    @Autowired
+    private UserValidator userValidator;
+
+    @Autowired
+    private ProducerService producerService;
+
+    @GetMapping(&quot;/registration&quot;)
+    public String registration(Model model) {
+<span class="nc" id="L36">        model.addAttribute(&quot;userForm&quot;, new User());</span>
+<span class="nc" id="L37">        return &quot;registration&quot;;</span>
+    }
+
+    @PostMapping(&quot;/registration&quot;)
+    public String registration(@ModelAttribute(&quot;userForm&quot;) @Valid User userForm, BindingResult bindingResult, Model model) {
+<span class="nc" id="L42">        userValidator.validate(userForm, bindingResult);</span>
+
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (bindingResult.hasErrors()) {</span>
+<span class="nc" id="L45">            return &quot;registration&quot;;</span>
+        }
+
+<span class="nc" id="L48">        userService.save(userForm);</span>
+<span class="nc" id="L49">        boolean loginSuccessful = securityService.autologin(userForm.getUsername(), userForm.getPasswordConfirm());</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if (!loginSuccessful) {</span>
+<span class="nc" id="L51">            return &quot;redirect:/login?error&quot;;</span>
+        }
+
+<span class="nc" id="L54">        return &quot;redirect:/welcome&quot;;</span>
+    }
+
+    @GetMapping(&quot;/&quot;)
+    public String login(Model model, @RequestParam(value = &quot;error&quot;, required = false) String error,
+                        @RequestParam(value = &quot;logout&quot;, required = false) String logout) {
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (error != null) {</span>
+<span class="nc" id="L61">            model.addAttribute(&quot;error&quot;, &quot;Your username and password is invalid.&quot;);</span>
+        }
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (logout != null) {</span>
+<span class="nc" id="L64">            model.addAttribute(&quot;message&quot;, &quot;You have been logged out successfully.&quot;);</span>
+        }
+<span class="nc" id="L66">        return &quot;login&quot;;</span>
+    }
+
+    @PostMapping(&quot;/login&quot;)
+    public String loginPost(@ModelAttribute(&quot;user&quot;) User user, Model model) {
+<span class="nc" id="L71">        boolean loginSuccessful = securityService.autologin(user.getUsername(), user.getPassword());</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (!loginSuccessful) {</span>
+<span class="nc" id="L73">            model.addAttribute(&quot;error&quot;, &quot;Your username and password is invalid.&quot;);</span>
+<span class="nc" id="L74">            return &quot;login&quot;;</span>
+        }
+<span class="nc" id="L76">        return &quot;redirect:/welcome&quot;;</span>
+    }
+
+    @GetMapping(&quot;/welcome&quot;)
+    public String welcome(Model model) {
+<span class="nc" id="L81">        return &quot;welcome&quot;;</span>
+    }
+
+    @GetMapping(&quot;/index&quot;)
+    public String indexHome(Model model) {
+<span class="nc" id="L86">        return &quot;index_home&quot;;</span>
+    }
+
+    @GetMapping(&quot;/users&quot;)
+    public String getAllUsers(Model model) {
+<span class="nc" id="L91">        List&lt;User&gt; users = userService.getList();</span>
+<span class="nc" id="L92">        model.addAttribute(&quot;users&quot;, users);</span>
+<span class="nc" id="L93">        return &quot;userList&quot;;</span>
+    }
+
+    @GetMapping(&quot;/users/{id}&quot;)
+    public String getOneUser(@PathVariable(&quot;id&quot;) String id, Model model) {
+        String result;
+        try {
+<span class="nc" id="L100">            User userData = MemcachedUtils.memcachedGetData(id);</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">            if (userData != null) {</span>
+<span class="nc" id="L102">                result = &quot;Data is From Cache&quot;;</span>
+<span class="nc" id="L103">                model.addAttribute(&quot;user&quot;, userData);</span>
+            } else {
+<span class="nc" id="L105">                User user = userService.findById(Long.parseLong(id));</span>
+<span class="nc" id="L106">                result = MemcachedUtils.memcachedSetData(user, id);</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">                if (result == null) {</span>
+<span class="nc" id="L108">                    result = &quot;Memcached Connection Failure !!&quot;;</span>
+                }
+<span class="nc" id="L110">                model.addAttribute(&quot;user&quot;, user);</span>
+            }
+<span class="nc" id="L112">            model.addAttribute(&quot;Result&quot;, result);</span>
+<span class="nc" id="L113">        } catch (Exception e) {</span>
+<span class="nc" id="L114">            e.printStackTrace();</span>
+<span class="nc" id="L115">        }</span>
+<span class="nc" id="L116">        return &quot;user&quot;;</span>
+    }
+
+    @GetMapping(&quot;/user/{username}&quot;)
+    public String userUpdate(@PathVariable(&quot;username&quot;) String username, Model model) {
+<span class="nc" id="L121">        User user = userService.findByUsername(username);</span>
+<span class="nc" id="L122">        model.addAttribute(&quot;user&quot;, user);</span>
+<span class="nc" id="L123">        return &quot;userUpdate&quot;;</span>
+    }
+
+    @PostMapping(&quot;/user/{username}&quot;)
+    public String userUpdateProfile(@PathVariable(&quot;username&quot;) String username, @ModelAttribute(&quot;user&quot;) User userForm) {
+<span class="nc" id="L128">        User user = userService.findByUsername(username);</span>
+<span class="nc" id="L129">        updateUserDetails(user, userForm);</span>
+<span class="nc" id="L130">        userService.save(user);</span>
+<span class="nc" id="L131">        return &quot;welcome&quot;;</span>
+    }
+
+//    @GetMapping(&quot;/user/rabbit&quot;)
+//    public String rabbitmqSetUp() {
+//        for (int i = 0; i &lt; 20; i++) {
+//            producerService.produceMessage(generateString());
+//        }
+//        return &quot;rabbitmq&quot;;
+//    }
+
+    private void updateUserDetails(User user, User userForm) {
+<span class="nc" id="L143">        user.setUsername(userForm.getUsername());</span>
+<span class="nc" id="L144">        user.setUserEmail(userForm.getUserEmail());</span>
+<span class="nc" id="L145">        user.setDateOfBirth(userForm.getDateOfBirth());</span>
+<span class="nc" id="L146">        user.setFatherName(userForm.getFatherName());</span>
+<span class="nc" id="L147">        user.setMotherName(userForm.getMotherName());</span>
+<span class="nc" id="L148">        user.setGender(userForm.getGender());</span>
+<span class="nc" id="L149">        user.setLanguage(userForm.getLanguage());</span>
+<span class="nc" id="L150">        user.setMaritalStatus(userForm.getMaritalStatus());</span>
+<span class="nc" id="L151">        user.setNationality(userForm.getNationality());</span>
+<span class="nc" id="L152">        user.setPermanentAddress(userForm.getPermanentAddress());</span>
+<span class="nc" id="L153">        user.setTempAddress(userForm.getTempAddress());</span>
+<span class="nc" id="L154">        user.setPhoneNumber(userForm.getPhoneNumber());</span>
+<span class="nc" id="L155">        user.setSecondaryPhoneNumber(userForm.getSecondaryPhoneNumber());</span>
+<span class="nc" id="L156">        user.setPrimaryOccupation(userForm.getPrimaryOccupation());</span>
+<span class="nc" id="L157">        user.setSecondaryOccupation(userForm.getSecondaryOccupation());</span>
+<span class="nc" id="L158">        user.setSkills(userForm.getSkills());</span>
+<span class="nc" id="L159">        user.setWorkingExperience(userForm.getWorkingExperience());</span>
+<span class="nc" id="L160">    }</span>
+
+    private static String generateString() {
+<span class="nc" id="L163">        return &quot;uuid = &quot; + UUID.randomUUID().toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
